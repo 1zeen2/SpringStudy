@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee https://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+<!-- 	
+		Tomcat에 의해서 실행 
+			1) Controller 등록 : Servlet
+								 =======
+						URL 주소에 의해 Tomcat이 호출
+									   =======
+									   	web.xml / server.xml
+		프로그램 제어는 스프링에 의해 작동
+					   =====
+					   	1. 클래스 관리 => 객체 생성 ~ 객체 소멸
+					   					클래스 관리자 (객체 생명 주기 관리자)
+					   		1) 객체 생성
+					   			=> 클래스명 / 찾기위한 구분자
+					   				<bean id="" class="">
+					   					  ===	======
+					   					   |	   |=> Class.forName() => 리플랙션
+					   					구분자 (ID는 중복이 불가능하다.)
+					   				=> 생성과 동시에 멤버 변수에 대한 초기화가 가능
+					   				   =========================================
+					   				   	DI => 스프링에 의해서 값이 설정이 된다.
+					   				   		=> 객체의 멤버 변수는 private(캡슐화) => 접근이 불가능
+					   				   			=> setXxx(), Constructor
+					   				   				  |			  |=> Constructor DI
+					   				   			setter DI		
+					   							<bean id=""	class="A"
+					   								p:name="홍길동"	=> setName("")
+					   							/>
+					   							class A {
+					   								private String name;
+					   								public void setName(String name) {
+					   									this.name = name;
+					   								}
+					   							}
+					   	DI (Dependency Injection) : 초기화
+									   ==========
+									    값을 주입 => Spring을 통해서 변수 값을 지정
+									   		=> 객체 생성 시 ==>	메서드 호출이 가능 ===> init-method
+									   			=> 드라이버 등록
+									   			=> 서버 연결
+									   		   객체 소멸 시 ==> 메서드 호출이 가능 ===> destroy-method
+									   		   	=> 데이터베이스 연결 해제
+									   		   	=> 서버 해제
+							1) setter DI
+							2) Constructor DI
+							3) Method DI
+							
+						스프링의 기본 기능 DIIIIIIII
+						======
+						클래스 관리자 => 개발자가 필요 시에는 생성된 객체를 사용할 때가 있다.
+						============ 관계도가 단순하다
+							1) 객체 찾기 => 사용 ==> DL (LookUp) ===> getBean()
+													@Autowied
+													
+							2) 객체 멤버 변수 초기화 ==> DI (Dependency Injection)
+					=> 클래스 등록 ==> <bean~~>
+					   ========== 패키지 단위로 등록 (제외 : 라이브러리 : <bean>)
+					   			  =========== 관리를 요청하는 클래스와 관리가 필요 없는 클래스
+					   			  구분해서 저장 => Annotation
+					   	기능 수행 : 한 개만 메모리 할당 : SingleTon
+					   				VO는 필요시마다 개발자가 직접 메모리 할당 후 사용 (스프링 관리에서 제외됨)
+					   	기능 별로 저장 (스프링)
+					   	============= 어노테이션이 올라간 클래스만 메모리 할당 (스프링 관리)
+					   	
+		(Aspect-Oriented Programming - 관점 지향 프로그래밍)
+						 |
+					   	AOP : 공통 모듈 (반복이 많은 경우) => 반복을 제거
+							  OOP에서는 자동 호출이 불가능 => AOP에서 보완
+					   		  	=> 보안 / 트랜잭션 / 로그파일
+					   		  		반복적으로 출력 (사용자 정의)
+					   		  		
+					   		PointCut	: 어떤 메서드에 적용 => 메서드 지정
+					   		JoinPoint	: 메서드 호출 위치를 지정
+					   	+	==========
+					   		Advice
+					   	
+					   		public String display() {
+					   			============================ Before => getConnection()
+					   			try {
+					   				======================== Around => setAutoCommit(false)
+					   				핵심 코딩
+					   				======================== Around => commit() 
+					   			} catch (Exception ex) {
+					   				After-Throwing : rollback()
+					   			} finally {
+					   				After : setAutoCommit()
+					   						disConnection()
+					   			}
+					   			return = After-returning
+					   		}
+		Spring => DI / AOP
+				  MVC
+				  Security
+				  
+				  => DI : 개념 ==> 클래스와 클래스 연관 관계 설정
+				  	=> DAO VS Service
+				  
+				  => AOP : 공통 기반의 메서드를 만들어 반복을 제거.
+				  	=> 트랜잭션 / 보안
+				  	
+		MVC : DI / AOP를 포함
+			=> Model		: 요청을 받아 JSP로 결과 값을 전송
+			=> View			: 화면에 출력 => Controller에서 전송된 결과 값
+			=> Controller	: 요청 처리
+				1) 유지 보수가 편리
+				2) 여러명이 동시에 개발 가능. => 개발 속도가 빠르다.
+				3) 재사용 / 확장이 가능하다.
+		동작
+			사용자 요청 (브라우저의 주소 창)
+				|		================= 서버와 연결
+				|		=> 파일 명 ==> 파일을 찾아서 HTML을 브라우저 전송
+				|
+			Controller 요청을 받는다, Model을 찾는다.
+				|					============== HandlerMapping
+			  Model => 메서드 호출 => 요청 처리가 가능 ==> DAO / Service 결과 값을 얻어온다.
+			  	|	   ========== 구분 : @GetMapping / @PostMapping / @RequestMapping
+			  	|	   	=> 메서드 명 없이 호출이 가능 ==> Invoke()
+			  	|	   									======== 구분자가 있어야만 원하는 함수 호출이 가능하다.
+			  	|=> request를 전송 : ViewResolver
+			JSP(View)
+			
+		=> Model에 있는 메서드 방식
+			=> ReturnType
+				=> String	: 화면 변경 
+								=> 이미 만들어진 화면으로 이동
+								   데이터를 전송할 필요가 없는 경우 ==>  Reset Request (ok.do) ===> sendRedirect ("redirect:../main/main.do)
+								   		=> 값을 전송해야 하는 경우 ===> RedirectAttribute
+								=> 화면 이동 ==> request에 값을 담아서 전송
+									=> 일반 화면
+									   forward
+									   return "foldernam/jspFileName";
+							
+				   Void		: 화면 변경이 없는 경우 => AJAX / DownLoad
+				   
+			   MethodName 	: 개발자 마음대로. (문법에 충실하게만)
+			   
+			   Parameter 	: 사용자 전송
+			   					=> 목록	=> (String page)
+			   					   상세 보기 ==> (int no)
+			   					   회원 가입 (MemberVO vo) => 커맨드 객체
+			   					   로그인 (String id, String pwd);
+			   					   검색 : String fd, String page)
+			   					   파일 여러 개 업로드 (List<muktipartFile < Fild>
+			   					   체크 박스 여러 개 : (String[])
+											
+		=> 메서드의 파라미터 ==> 사용자가 보내준 요청 데이터를 받는 곳
+		   ================ GetParameter를 사용하지 않는다.
+		   					============ Spring 자체에서 처리해줌.
+	================================================================================
+				처리 / 전송
+					=> Cookie 
+						=> HttpServletRequest : 쿠키 읽기
+							Cookie[] cookies = request.getCookie()
+							다운로드
+							
+						=> 결과 값 전송
+							=> foward : Mdel
+								Model.addAttribute(String key, ojbect obj)
+								
+							=> sendRedirect : RedirectaAtribute
+								ra.addribute (...,  ...)
+							=> HttpSession : 사용자의 일부 정보를 저장
+								=> 어떤 JSP는 상관 없이 사용이 가능
+									
+					=> 구분자
+						=> 사용자 요청
+							=> <a>		: GET
+								<a href ="a.do"></a>
+							
+								@GetMapping("a.do")
+									=> <form> : GET / POST
+										<form method="get">
+										<form method="post">
+								@Postmapping
+									=> AJAX : GET / POST
+										$.ajax({
+										AJAX : type:'get' @GetMapping
+											type ; postMapping
+										})
+								=> 메서드의 매개 변수 => 사용자가 보내준 요청 데이터를 받는 곳
+								  ================== getP
+								  
+								  404 => 파일이 없는 경우 
+								  500 => DAO, NULL
+								  400 => 매개 변수에서 받는 값의 데이터 타입이 다른 경우
+								  405 => GET / POST 구분 안됨
+								  403 => 접근 거부
+								  412 => 한글 변환 문제
+								  200 => 정상 수행 => 정상 화면			
+								
+								Method ReturnType / Parameter
+									   ====================== No rules								
+-->									
+<!--
+	톰캣에 의해 실행 : Servlet 
+	Servlet 등록 : Controller
+	url-pattern이 필요. 우리는 .do로 지정
+		=> Call DispatcherServlet
+			=> public void service() => Thread => 각 클라이언트마다 따로 처리.
+										====== 요청 개수만큼 service()를 생성. (10명의 유저 => 10개의 service ==> 충돌이 없다.)	
+-->
+<!-- 어떤 이름으로 DispatcherServlet을 처리할 것 인지. -->
+<!-- 한글 처리를 어떻게 할 것 인지. 가 전부이다 -->
+	<servlet>
+		<servlet-name>dispatcher</servlet-name>
+		<!-- @WebServlet("*.do") -->
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet
+		</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/config/application-*.xml</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>dispatcher</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+	<!-- 
+		한글 변환 : request를 사용하지 않는다. => 자동으로 한글 변환 처리.
+	 -->
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter
+		</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+</web-app>

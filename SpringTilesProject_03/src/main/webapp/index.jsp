@@ -6,10 +6,10 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 <script type="text/javascript">
-location.href="main/main.do"
+location.href="member/login.do"
 </script>
 </head>
 <body>
   
 </body>
-</html>
+</html> 

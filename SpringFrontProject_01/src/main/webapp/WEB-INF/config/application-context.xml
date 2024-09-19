@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
+
+	<!-- 
+		사용자 정의 클래스 등록
+			선별적인 메모리 할당
+			스프링에 관리 요청 : DAO, Manager, Service
+			@Component
+			@Repository
+			@Service
+			@Controller
+			@RestController
+			@ControllerAdvice
+			@Configuration
+	 -->
+	<context:component-scan base-package="com.sist.*"/>
+	<!-- AOP 등록 -->
+	<aop:aspectj-autoproxy
+	
+	/>
+	<!-- ViewResolver 등록 -->
+	<!-- 
+		DispatcherServlet 등록		<==========>	WebApplicationContext
+				|												|
+			요청을 받아서								등록된 클래스 관리 (컨테이너)
+			결과 값 전송
+			
+		1) 클래스 관리 요청 => DispatcherServlet이 XML의 경로명을 받아서
+								WebApplicationContext로 전송 => 등록 클래스의 메모리 할당
+			<init-param>		
+				<param-name>contextConfigLocation</param-name>
+		    	<param-value>/WEB-INF/config/application-*.xml</param-value>
+		  	</init-param>
+			
+		2) Model 클래스를 찾아주는 역할
+		   ===== 구분자
+		   	1. @Controller
+		   	2. @RestController
+		   	================== 클래스 구분
+			   	1. @GetMapping()
+			   	2. @PostMapping()
+			   	3. @RequestMapping() => PutMapping(), DeleteMapping()
+			   	================== 메서드 구분
+					=> HandlerMapping (자동 생성)
+						web.xml에 등록하면 자동 생성
+						
+		3) View(JSP)를 찾아주는 역할 => ViewResolver
+			=> 경로명 / 확장자 전송 => Spring은 Java 전용이 아니기 때문에.
+			   ==============
+			   prefix / suffix
+				=> 확장자가 존재하기 때문에 ==> 화면 이동 시에 .jsp를 붙이지 않음.
+				 
+			=> Mapper : 1개 테이블 1개 제어.
+						BoardDAO / ReplyDAO => @Autowired를 2개 (각각)사용해야 함.
+			=> Mapper가 여러 개를 모아서 처리해주는 것 ==> Service
+						=> BoardDAO / ReplyDAO ==> BoardService 하나로 통합
+						
+				=> 요청 ==> Service ===> DAO ====> Oracle
+				   응답 <== Service <=== DAO <==== Oracle
+			
+		셋팅
+			1. 라이브러리 추가 : Maven / Gradle
+					|			  |		  |=> Spring-Boot / Kotlin
+					|		Spring Framework => 라이브러리 관리 / 프로젝트 관리 / 배포 관리 / 버전 관리
+				 pom.xml => mvnrepository.com => 라이브러리가 없는 경우 ==> lib ===> <systemPath>
+			
+			2. Spring5 => jdk 1.8이상
+			
+			3. 클래스 등록 
+				=> application-context.xml
+				=> application-datasource.xml
+				=> application-security.xml	
+				=> application-task.xml
+				=> application-websocket.xml
+			=> xml의 단점 : 파일의 크기가 크다. => 속도가 느려진다.
+			
+			4. Mapper 등록 (MyBatis)
+			
+			5. Model을 만들어 요청에 대한 처리를 한다.
+				= 요청에 대한 화면 이동
+					= @Controller
+						return "경로 명 / 파일 명"; => JSP file에 request를 전송
+														결과 값을 전송.
+														request.setAttribute()
+														model.addAttribute()
+															=> forward
+															
+						return "redirect: ~~";	=> 이미 만들어진 화면 이동
+													request가 초기화
+													_ok.do 
+													sendRedirect
+				= 요청에 대한 데이터만 전송.
+					= @RestController ==> JavaScript나 다른 언어와 연동.
+										  ============================
+										  	JSON
+						=> 일반 문자열 / <script>
+						=> JSON (JavaScript Object Notation) => JavaScript 객체 표현법
+							자바 / 자바스크립트 호환
+							~VO  / {} (Object)
+							List / [] (Array) 
+							
+			6. 응답을 받아 처리한다. => JSP
+			   =================== Ajax / Vue / React
+			   	Vue => 가볍다 / 양방향 통신이 가능 / React보다 간단하다. (어렵다)
+			   									   ======> 파싱이 어렵고 단방향이다.
+			   									   React-Query / Redux / MobX
+			   									   
+			=> 처리 메서드
+				리턴 타입 :
+				
+				매개 변수 : 사용자가 전송한 값을 받는다.
+							detail.do?no=1
+									  ==
+							(int no)   |=> parameter가 일치해야 함.
+								 =======
+								 
+							detail.do?no=1&fd=aaa&page=1
+									  ==   ==     ====
+								(int no, String fd, int page)
+								
+								(BoardVO vo) => insert / update ==> <form>
+								============ 커맨드 객체
+								<input type=text name=name>
+													  ==== 반드시 VO안에 name이 setter로 제작되어있어야 한다.
+							=> 내장 객체
+								Cookie : 저장 => HttpServletResponse (다운로드 시)
+										 읽기 => HttpServletRequest
+										 
+								데이터 전송 : Model
+								
+								로그인 => HttpSession
+								
+								Redirect => 데이터 전송 == RedirectAttributes
+									=> return "redirect:detail.do?no=" + no + "&curpage" + page
+										=> ra.addAttribute("no", no)
+										=> ra.addAttribute("curpage", page)
+										
+							=> 한글 변환은 web.xml에 등록
+										
+				메서드 명 : 개발자 마음
+					=> /login/admin/1234 => React ...
+	-->
+	<!-- 
+		return "main/main";
+	 -->
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+		p:prefix="/"
+		p:suffix=".jsp"
+	/>
+	<!-- 
+		/main/main.jsp
+	   ==		   === 접미어 => suffix
+	 접두어 => prefix	
+	 			
+	 -->
+</beans>
