@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -24,14 +26,24 @@
                 <div class="col-7 col-sm-6">
                     <div class="signup-search-area d-flex align-items-center justify-content-end">
                         <div class="login_register_area d-flex">
+                          <c:if test="${sessionScope.userId==null }">
                             <div class="login">
-                                 ID&nbsp;<input type="text" size=10>
-                                 Password&nbsp;<input type="password" size=10>
-                                 <input type=button value="로그인" class="btn-sm btn-danger">
+                                <a href="../member/login.do">로그인</a>
                             </div>
                             <div class="register">
-                                <a href="register.html">Sing up</a>
+                                <a href="../member/join.do">회원가입</a>
                             </div>
+                          </c:if>
+                          <c:if test="${sessionScope.userId!=null }">
+                            <div class="login">
+                                ${sessionScope.userName}(<sec:authorize access="hasRole('ROLE_ADMIN')">관리자</sec:authorize>
+                                  <sec:authorize access="hasRole('ROLE_USER')">일반사용자</sec:authorize>
+                                )
+                                님 로그인되었습니다&nbsp;&nbsp;
+                                <a href="../member/logout.do">로그아웃</a>
+                            </div>
+                            
+                          </c:if>
                         </div>
                         
                         <!-- <div class="search_button">
@@ -77,28 +89,39 @@
                                 </li>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="yummyDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">회원</a>
-                                    <div class="dropdown-menu" aria-labelledby="yummyDropdown">
-                                        <a class="dropdown-item" href="index.html">회원가입</a>
-                                        <a class="dropdown-item" href="archive.html">아이디찾기</a>
-                                        <a class="dropdown-item" href="single.html">비밀번호찾기</a>
-                                    </div>
+                                    <c:if test="${sessionScope.userId==null}">
+	                                    <div class="dropdown-menu" aria-labelledby="yummyDropdown">
+	                                        <a class="dropdown-item" href="index.html">회원가입</a>
+	                                        <a class="dropdown-item" href="archive.html">아이디 찾기</a>
+	                                        <a class="dropdown-item" href="single.html">비밀번호 찾기</a>
+	                                    </div>
+                                    </c:if>
+                                    <c:if test="${sessionScope.userId!=null}">
+	                                    <div class="dropdown-menu" aria-labelledby="yummyDropdown">
+	                                        <a class="dropdown-item" href="index.html">회원 수정</a>
+	                                        <a class="dropdown-item" href="archive.html">회원 탈퇴</a>
+	                                    </div>
+                                      </c:if>
                                 </li>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="yummyDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">맛집</a>
                                     <div class="dropdown-menu" aria-labelledby="yummyDropdown">
-                                        <a class="dropdown-item" href="../food/list.do">맛집목록</a>
-                                        <a class="dropdown-item" href="../food/find.do">맛집검색</a>
-                                        <a class="dropdown-item" href="single.html">맛집예약</a>
-                                        <a class="dropdown-item" href="static.html">맛집추천</a>
+                                        <a class="dropdown-item" href="../food/list.do">맛집 목록</a>
+                                        <a class="dropdown-item" href="../food/find.do">맛집 검색</a>
+                                        <sec:authorize access="hasAnyRole('ROLE_ADMIN','ROLE_USER')">
+	                                        <a class="dropdown-item" href="single.html">맛집 예약</a>
+	                                        <a class="dropdown-item" href="static.html">맛집 추천</a>
+                                        </sec:authorize>
                                     </div>
                                 </li>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="yummyDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">레시피</a>
                                     <div class="dropdown-menu" aria-labelledby="yummyDropdown">
-                                        <a class="dropdown-item" href="../recipe/list.do">레시피목록</a>
-                                        <a class="dropdown-item" href="../recipe/chef.do">쉐프목록</a>
-                                        <a class="dropdown-item" href="single.html">레시피만들기</a>
-                            
+                                        <a class="dropdown-item" href="../recipe/list.do">레시피 목록</a>
+                                        <a class="dropdown-item" href="../recipe/chef.do">쉐프 목록</a>
+                                        <sec:authorize access="hasRole('ROLE_USER')">
+                                       		<a class="dropdown-item" href="single.html">레시피 만들기</a>
+                            			</sec:authorize>
                                     </div>
                                 </li>
                                 <li class="nav-item dropdown">
@@ -117,24 +140,34 @@
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="yummyDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">커뮤니티</a>
                                     <div class="dropdown-menu" aria-labelledby="yummyDropdown">
-                                        <a class="dropdown-item" href="index.html">자유게시판</a>
-                                        <a class="dropdown-item" href="archive.html">공지사항</a>
-                                        <a class="dropdown-item" href="single.html">1:1채팅</a>
-                                        <a class="dropdown-item" href="single.html">실시간 채팅</a>
+                                        <a class="dropdown-item" href="index.html">자유 게시판</a>
+                                        <a class="dropdown-item" href="archive.html">공지 사항</a>
+                                        <sec:authorize access="hasAnyRole('ROLE_ADMIN','ROLE_USER')">
+                                        	<a class="dropdown-item" href="single.html">1:1채팅</a>
+                                        	<a class="dropdown-item" href="single.html">묻고 답하기</a>
+                                        </sec:authorize>
+                                        <sec:authorize access="hasRole('ROLE_USER')">
+                                        	<a class="dropdown-item" href="single.html">실시간 채팅</a>
+                                       	 </sec:authorize>
                                     
                                     </div>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">빠른예약</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="archive.html">마이페이지</a>
-                                </li>
-                                <!-- 
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">관리자페이지</a>
-                                </li>
-                                -->
+                                <sec:authorize access="hasRole('ROLE_USER')">
+	                                <li class="nav-item">
+	                                    <a class="nav-link" href="#">빠른예약</a>
+	                                </li>
+                                </sec:authorize>
+                                <sec:authorize access="hasRole('ROLE_USER')">
+	                                <li class="nav-item">
+	                                    <a class="nav-link" href="archive.html">마이페이지</a>
+	                                </li>
+								</sec:authorize>
+								<sec:authorize access="hasRole('ROLE_ADMIN')">
+	                                <li class="nav-item">
+	                                    <a class="nav-link" href="#">관리자페이지</a>
+	                                </li>
+                                </sec:authorize>
+
                                 
                             </ul>
                         </div>

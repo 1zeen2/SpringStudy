@@ -21,7 +21,6 @@
 		</repository>
 	</repositories>
 	<dependencies>
-	    <!--  크롤링 -->
 	    <dependency>
 		    <groupId>org.seleniumhq.selenium</groupId>
 		    <artifactId>selenium-java</artifactId>
@@ -55,7 +54,6 @@
 		    <artifactId>spring-security-taglibs</artifactId>
 		    <version>5.1.5.RELEASE</version>
 		</dependency>
-		<!-- JSON : Vue -->
 	   <dependency>
 		    <groupId>com.fasterxml.jackson.core</groupId>
 		    <artifactId>jackson-databind</artifactId>
@@ -72,7 +70,6 @@
 		    <artifactId>ojdbc8</artifactId>
 		    <version>21.1.0.0</version>
 		</dependency>
-		<!-- Mybatis Log처리 -->
 	    <dependency>
 		    <groupId>org.lazyluke</groupId>
 		    <artifactId>log4jdbc-remix</artifactId>
@@ -199,6 +196,16 @@
          <version>1.1.2</version>
       </dependency>
 
+      <dependency>
+         <groupId>org.nuiton.thirdparty</groupId>
+         <artifactId>Rserve</artifactId>
+         <version>1.7-3</version>
+      </dependency>
+      <dependency>
+         <groupId>org.nuiton.thirdparty</groupId>
+         <artifactId>REngine</artifactId>
+         <version>1.7-3</version>
+      </dependency>
       <!-- 
          @Select("<script>SELECT~~ <if test="">")
        -->
@@ -211,6 +218,21 @@
          <groupId>org.mybatis</groupId>
          <artifactId>mybatis-spring</artifactId>
          <version>1.2.0</version>
+      </dependency>
+      <dependency>
+         <groupId>org.mongodb</groupId>
+         <artifactId>mongo-java-driver</artifactId>
+         <version>2.13.0-rc1</version>
+      </dependency>
+      <dependency>
+         <groupId>org.nuiton.thirdparty</groupId>
+         <artifactId>JRI</artifactId>
+         <version>0.9-6</version>
+      </dependency>
+      <dependency>
+         <groupId>com.github.lucarosellini.rJava</groupId>
+         <artifactId>JRIEngine</artifactId>
+         <version>0.9-7</version>
       </dependency>
       <dependency>
          <groupId>aopalliance</groupId>
@@ -273,6 +295,26 @@
          <version>3.18.2-GA</version>
       </dependency>
 	  
+      <dependency>
+         <groupId>org.nuiton.thirdparty</groupId>
+         <artifactId>Rserve</artifactId>
+         <version>1.7-3</version>
+      </dependency>
+      <dependency>
+         <groupId>org.nuiton.thirdparty</groupId>
+         <artifactId>REngine</artifactId>
+         <version>1.7-3</version>
+      </dependency>
+      <dependency>
+			<groupId>org.twitter4j</groupId>
+			<artifactId>twitter4j-core</artifactId>
+			<version>4.0.2</version>
+		</dependency>
+        <dependency>
+			<groupId>org.twitter4j</groupId>
+			<artifactId>twitter4j-stream</artifactId>
+			<version>4.0.2</version>
+		</dependency>
         <dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
@@ -309,7 +351,7 @@
 		<artifactId>asm</artifactId>
 		<version>3.1</version>
 	</dependency>
-		<!-- tiles : <jsp:include> -->
+		<!-- tiles  -->
 		<dependency>
 			<groupId>org.apache.tiles</groupId>
 			<artifactId>tiles-core</artifactId>
